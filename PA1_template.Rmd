@@ -2,7 +2,7 @@
 title: "Activity Monitoring"
 author: "Camille"
 date: "October 3, 2016"
-output: html_document
+output: ActivityMonitoring.html
 ---
 
 ```{r setup, include=FALSE}

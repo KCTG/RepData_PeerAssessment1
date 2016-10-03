@@ -1,25 +1,94 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
+title: "Reproducible Research: Activity Monitoring"
 output: 
-  html_document:
+  html_document: ActivityMonitoring.html
     keep_md: true
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(mice)
+library(VIM)
+```
 
 ## Loading and preprocessing the data
+## R Markdown
 
+This is an R Markdown document for the activity monitoring assignment. This records all steps in reproducing answers to all questions in this assignment.
 
+We first load data of all the activities from October to November 2012. In this code chunk, NA's are also omitted from the data set:
+```{r activity}
+activity <- na.omit(read.table("repdata_activity/activity.csv", sep = ",", header = TRUE))
+```
+*Ensure that you have set the correct working directory*
+
+Convert date format
+```{r}
+activity$date <- as.Date(activity$date, format = "%Y-%m-%d")
+```
 
 ## What is mean total number of steps taken per day?
+```{r q1}
+steps.day <- activity %>% group_by(date) %>% summarise(total.steps = sum(steps))
+hist(steps.day$total.steps, main = "Total Steps per Day")
+abline(v = median(steps.day$total.steps), col = "blue", lwd = 3)
+abline(v = mean(steps.day$total.steps), col = "yellow", lwd = 2, lty=3)
+legend(x = "topright", c("Median", "Mean"), col = c("blue", "yellow"), lwd = c(3,2), lty = c(1,3))
+```
 
-
+Mean:
+```{r echo=FALSE}
+mean(steps.day$total.steps)
+```
+Median:
+```{r echo=FALSE}
+median(steps.day$total.steps)
+```
 
 ## What is the average daily activity pattern?
+```{r q2}
+avg.per.interval <- activity %>% group_by(interval) %>% summarise(mean.per.interval = mean(steps))
+with(avg.per.interval, plot(interval, mean.per.interval, xlab = "Interval", ylab = "Average steps per interval", type = "l", main = "Average daily pattern"))
+abline(h = max(avg.per.interval$mean.per.interval), lwd = 2, col = "red")
+legend(x = "topright", c("Max"), col = c("red"), lwd = c(2))
+```
 
+Max: 
+```{r echo=FALSE}
+max(avg.per.interval$mean.per.interval)
+```
 
 
 ## Imputing missing values
+```{r imputed.data}
+activity.w.na <- read.table("repdata_activity/activity.csv", sep=",", header = TRUE)
+sum(!complete.cases(activity.w.na$steps)) # Count of incomplete cases
+md.pattern(activity.w.na) #check missing data
+mice.plot <- aggr(activity.w.na, col = c("blue","red"), numbers = TRUE, sortVars = TRUE, labels = names(activity.w.na), cex.axis = .7, gap = 7, ylab = c("Missing Data", "Pattern")) #visualize pct of missing data 
+activity.imputed <- mice(activity.w.na, seed = 500) #impute data, using defaults
+activity.imputed.complete <- complete(activity.imputed, 3) #completed data, choosing 3rd data set
+steps.day.complete <- activity.imputed.complete %>% group_by(date) %>% summarise(total.steps = sum(steps))
+hist(steps.day.complete$total.steps, main = "Total Steps per Day")
+abline(v = median(steps.day.complete$total.steps), col = "blue", lwd = 3)
+abline(v = mean(steps.day.complete$total.steps), col = "red", lwd = 2, lty=3)
+legend(x = "topright", c("Median", "Mean"), col = c("blue", "red"), lwd = c(3,2), lty = c(1,3))
+```
 
-
+Mean with imputed data:
+```{r echo=FALSE}
+mean(steps.day.complete$total.steps)
+```
+Median with imputed data:
+```{r echo=FALSE}
+median(steps.day.complete$total.steps)
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r q3}
+wkdays <- c("Monday","Tuesday","Wednesday","Thursday","Friday")
+activity.wday <- activity.imputed.complete %>% mutate(wkday = factor((weekdays(as.Date(date)) %in% wkdays), levels = c(FALSE, TRUE), labels = c('weekend', 'weekday')))
+avg.steps.wday <- activity.wday %>% group_by(wkday, interval) %>% summarise(mean.wday = mean(steps))
+qplot(interval, mean.wday, data = avg.steps.wday, geom = "line", xlab = "Interval", ylab = "Number of Steps", facets = wkday ~ .)
+```

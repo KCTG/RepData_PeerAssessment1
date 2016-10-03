@@ -1,8 +1,8 @@
 ---
-title: "Reproducible Research: Activity Monitoring"
-output: 
-  html_document: ActivityMonitoring.html
-    keep_md: true
+title: "Activity Monitoring"
+author: "Camille"
+date: "October 3, 2016"
+output: html_document
 ---
 
 ```{r setup, include=FALSE}

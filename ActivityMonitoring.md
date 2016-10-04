@@ -34,7 +34,7 @@ abline(v = mean(steps.day$total.steps), col = "yellow", lwd = 2, lty=3)
 legend(x = "topright", c("Median", "Mean"), col = c("blue", "yellow"), lwd = c(3,2), lty = c(1,3))
 ```
 
-![plot of chunk q1](figure/q1-1.png)
+![plot of chunk q1](figure/TotalStepsPerDay.png)
 
 
 Mean:
@@ -57,7 +57,7 @@ abline(h = max(avg.per.interval$mean.per.interval), lwd = 2, col = "red")
 legend(x = "topright", c("Max"), col = c("red"), lwd = c(2))
 ```
 
-![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png)
+![plot of chunk unnamed-chunk-4](figure/AverageDailyPattern.png)
 
 Max: 
 
@@ -92,7 +92,7 @@ md.pattern(activity.w.na) #check missing data
 mice.plot <- aggr(activity.w.na, col = c("blue","red"), numbers = TRUE, sortVars = TRUE, labels = names(activity.w.na), cex.axis = .7, gap = 7, ylab = c("Missing Data", "Pattern")) #visualize pct of missing data 
 ```
 
-![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png)
+![plot of chunk unnamed-chunk-6](figure/IMputeMissingData.png)
 
 ```
 ## 
@@ -151,7 +151,7 @@ abline(v = mean(steps.day.complete$total.steps), col = "red", lwd = 2, lty=3)
 legend(x = "topright", c("Median", "Mean"), col = c("blue", "red"), lwd = c(3,2), lty = c(1,3))
 ```
 
-![plot of chunk imputed.data](figure/imputed.data-1.png)
+![plot of chunk imputed.data](figure/TotalStepsPerDayw.ImputedData.png)
 
 Mean with imputed data:
 
@@ -173,4 +173,4 @@ avg.steps.wday <- activity.wday %>% group_by(wkday, interval) %>% summarise(mean
 qplot(interval, mean.wday, data = avg.steps.wday, geom = "line", xlab = "Interval", ylab = "Number of Steps", facets = wkday ~ .)
 ```
 
-![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png)
+![plot of chunk unnamed-chunk-9](figure/NumberofStepsWkday.png)
